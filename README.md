@@ -5,7 +5,7 @@
 <div align="center">
     <strong>Osmium</strong>
     <p>The programming language with the atomic number of 76.</p>
-    <img src="https://img.shields.io/badge/version-Early_Beta_V0.1-blue" alt="version">
+    <img src="https://img.shields.io/badge/version-Early_Beta_V0.2-blue" alt="version">
     <p>
     <img src="https://img.shields.io/badge/platforms-Linux-green" alt="platforms">
 </div>
@@ -20,10 +20,13 @@ To compile your Osmium code, simply follow these steps:
 * Call the executable in a terminal with a file location to compile.
     * To specify the output file names, include "-out \[name\]" at the end of the command.
 * Run the ".out" file generated, and you have just ran compiled Osmium code!
-# Documentation
-As of now, no offical documentation exists for Osmium. However, you are able to
-check out the [parser](src/parser.c) to take a glance at the grammar from the
-token advancements and so on.
+# V0.2 Changelog
+With the new Early Beta V0.2 version, the following has been added to the Osmium programming language:
+* While loops.
+* Breaking and continuing within while loops.
+* Non-entry point function defintions.
+* Function calling.
+* Non-exiting returns.
 # Warnings
 * The compiler is still in development.
 * The compiler doesn't have many features yet.

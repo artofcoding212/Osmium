@@ -43,6 +43,9 @@ linked_list* tokenize(char* src){
 
                     if(current != '*' || src[pos + 1] != '/')
                         error("[tokenizer]-> encountered unterminated multi-line comment\n");
+
+                    pos += 2;
+                    current = src[pos];
                 
                     continue;
                 }

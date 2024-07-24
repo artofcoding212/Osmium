@@ -1,14 +1,7 @@
-fn main(){
-    vr x: int = 1;
-    vr y: int = x;
-    
-    if(0){
-        y = 2;
-    }elif(0){
-        y = 3;
-    }else{
-        y = 4;
-    }
+fn add(x: int, y: int){
+    ret x + y;
+}
 
-    ret y;
+fn main(){
+    ret add(4, 2);
 }

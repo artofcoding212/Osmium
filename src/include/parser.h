@@ -11,11 +11,15 @@ typedef enum ast_type {
     AST_RET,
     AST_SCOPE,
     AST_IF_TREE,
+    AST_LOOP,
+    AST_BRK,
+    AST_CNT,
     //--EXPRESSIONS--//
     AST_IDENT,
     AST_INT,
     AST_STR,
     AST_BIN,
+    AST_CALL,
     //--TYPES--//
     AST_IDENT_T,
     AST_LIT_T,
@@ -48,6 +52,10 @@ typedef struct ast_node {
             struct ast_node* else_body;
         } if_tree;
         struct {
+            struct ast_node* condition;
+            struct ast_node* scope;
+        } loop;
+        struct {
             char* value;
         } ident;
         struct {
@@ -61,6 +69,10 @@ typedef struct ast_node {
             struct ast_node* right;
             char* op;
         } bin;
+        struct{ 
+            char* caller;
+            linked_list* args;
+        } call;
         struct {
             struct ast_node* lit;
         } lit_t;

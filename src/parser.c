@@ -125,16 +125,44 @@ static ast_node* parse_primary(parser* parser){
     return 0;
 }
 
+static ast_node* parse_call(parser* parser){
+    parser->state = PARSER_FWD;
+
+    ast_node* caller = parse_primary(parser);
+
+    if(parser->token->type == TOKEN_LPAREN){
+        if(caller->type != AST_IDENT)
+            error("[parser]-> line %lu: expected caller of call to be of type '%d', instead got an ast node of type '%d'", caller->line, AST_IDENT, caller->type);
+
+        unsigned long ln = parser->token->line;
+        parser_mov(parser);
+        ast_node* call = init_ast_node(AST_CALL, ln);
+        call->call.caller = caller->ident.value;
+        call->call.args = init_linked_list();
+
+        while(parser->token->type != TOKEN_RPAREN){
+            linked_list_append(call->call.args, parse_expr(parser));
+            if(parser->token->type != TOKEN_RPAREN)
+                parser_expect(parser, TOKEN_COMMA);
+        }
+
+        parser_expect(parser, TOKEN_RPAREN);
+        return call;
+    }
+
+    return caller;
+}
+
 static ast_node* parse_mul(parser* parser){
     parser->state = PARSER_FWD;
 
-    ast_node* left = parse_primary(parser);
+    ast_node* left = parse_call(parser);
     
     while(parser->token->type == TOKEN_STAR || parser->token->type == TOKEN_SLASH){
         ast_node* bin = init_ast_node(AST_BIN, parser->token->line);
         bin->bin.left = left;
         bin->bin.op = parser_mov(parser)->value;
-        bin->bin.right = parse_primary(parser);
+        bin->bin.right = parse_call(parser);
 
         left = bin;
     }
@@ -305,6 +333,29 @@ static ast_node* parse_if(parser* parser, unsigned kwrd){
     return tree;
 }
 
+static ast_node* parse_loop(parser* parser){
+    parser->state = PARSER_FWD;
+    unsigned long ln = parser->token->line;
+    parser_expect(parser, TOKEN_IDENT);
+    parser_expect(parser, TOKEN_LPAREN);
+
+    ast_node* loop = init_ast_node(AST_LOOP, ln);
+    loop->loop.condition = parse_expr(parser);
+    parser_expect(parser, TOKEN_RPAREN);
+    loop->loop.scope = parse_scope(parser);
+
+    return loop;
+}
+
+static ast_node* parse_kword(parser* parser, ast_type type){
+    parser->state = PARSER_FWD;
+    unsigned long ln = parser->token->line;
+    parser_expect(parser, TOKEN_IDENT);
+    parser_expect(parser, TOKEN_SEMI);
+
+    return init_ast_node(type, ln);
+}
+
 static ast_node* parse_stmt(parser* parser){
     if(is_keyword(parser->token, "fn") == 0)
         return parse_func(parser);
@@ -314,6 +365,12 @@ static ast_node* parse_stmt(parser* parser){
         return parse_var_def(parser);
     if(is_keyword(parser->token, "if") == 0)
         return parse_if(parser, 1);
+    if(is_keyword(parser->token, "wh") == 0)
+        return parse_loop(parser);
+    if(is_keyword(parser->token, "brk") == 0)
+        return parse_kword(parser, AST_BRK);
+    if(is_keyword(parser->token, "cnt") == 0)
+        return parse_kword(parser, AST_CNT);
     if(parser->token->type == TOKEN_LBRACE)
         return parse_scope(parser);
 
